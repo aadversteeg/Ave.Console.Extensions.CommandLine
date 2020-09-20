@@ -2,6 +2,13 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <Authors>Aad Versteeg</Authors>
+    <PackageProjectUrl>https://github.com/aadversteeg/Ave.Extensions.Console.CommandLine</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/aadversteeg/Ave.Extensions.Console.CommandLine</RepositoryUrl>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageLicenseUrl>https://raw.githubusercontent.com/aadversteeg/Ave.Extensions.Console.CommandLine/master/LICENSE</PackageLicenseUrl>
+    <Company>Versteeg IT Solutions</Company>
+    <Copyright>Versteeg IT Solutions / Aad Versteeg</Copyright>
   </PropertyGroup>
 
 </Project>
