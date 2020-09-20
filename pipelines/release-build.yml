@@ -1,0 +1,64 @@
+trigger:
+  branches:
+    include:
+      - refs/tags/v*
+      
+variables:
+  BuildConfiguration: 'Release'
+  PackageVersion: $[replace(variables['Build.SourceBranch'], 'refs/tags/v', '')]
+  PackageName: Ave.Extensions.Console.CommandLine
+
+stages:
+  - stage: Build
+    jobs:
+      - job: Build
+        pool: Hosted Windows 2019 with VS2019
+        steps:
+
+        - task: DotNetCoreCLI@2
+          displayName: Restore
+          inputs:
+            command: restore
+            projects: '**/*.csproj'
+
+        - task: DotNetCoreCLI@2
+          displayName: Build
+          inputs:
+            projects: '**/*.sln'
+            arguments: '--configuration $(BuildConfiguration)'
+
+        - task: DotNetCoreCLI@2
+          displayName: Test
+          inputs:
+            command: test
+            projects: '**/UnitTests*.csproj'
+            arguments: '--configuration $(BuildConfiguration)'
+            
+        - task: DotNetCoreCLI@2
+          displayName: Pack
+          inputs:
+            command: pack
+            custom: --no-build
+            packagesToPack: '**/Ave.*.csproj'
+
+        - task: PublishBuildArtifacts@1
+          displayName: 'Publish Artifact'
+          inputs:
+            PathtoPublish: '$(build.artifactstagingdirectory)'            
+            
+  - stage: Publish
+    jobs:
+      - job: Publish
+        pool: Hosted Windows 2019 with VS2019
+        steps:
+        - script: echo $(PackageVersion)
+        - checkout: none
+        - download: current
+        - task: GithubRelease@0 
+          displayName: 'Create GitHub Release'   
+          inputs:
+            gitHubConnection: azurepipelines
+            repositoryName: aadversteeg/$(PackageName)
+            assets: $(Pipeline.Workspace)/**/*.nupkg
+        - script: dotnet nuget push $(Pipeline.Workspace)/drop/$(PackageName).$(PackageVersion).nupkg --source https://api.nuget.org/v3/index.json --api-key $(nuget-apikey)
+
